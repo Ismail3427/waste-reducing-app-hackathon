@@ -1,10 +1,17 @@
 import tensorflow as tf
+import numpy as np
 
 data_dir = "../images"
+test_image = "../image.png"
 
 class_names = [
-  "batteries", "cans_all_types"
+  "batteries", "cans_all_types", "cermaic_product", "cofee_tea_bags", "coffee_tea_bags", "diapers", "e-waste", "egg_shells", "food_scraps", "glass_containers", "kitchen_waste", "paints", "paper_products", "pesticides", "plastic_bottles", "plastic_bags_wrappers", "sanitary_napkin", "stroform_product", "yard_trimmings"
 ]
+
+img = tf.keras.utils.load_img(test_image, target_size=(150, 150))
+
+img_array = tf.keras.utils.img_to_array(img)
+img_array = tf.expand_dims(img_array, 0)
 
 num_classes = 18
 
@@ -66,3 +73,13 @@ model.fit(
   validation_data=val_ds,
   epochs=10
 )
+
+predictions = model.predict(img_array)
+
+highest_score_index = np.argmax(predictions)
+
+predicted_class = class_names[highest_score_index]
+
+confidence = 100 * np.max(predictions)
+
+print(f"Predicted class: {predicted_class} with confidence: {confidence:.2f}%")
