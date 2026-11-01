@@ -39,16 +39,10 @@ for root, dirs, files in os.walk(data_dir):
 print(converted_count, "images converted from WEBP to PNG.")
 print (deleted_count, "corrupted images deleted.")
 
-class_names = [
-  "batteries", "cans_all_types", "cermaic_product", "cofee_tea_bags", "coffee_tea_bags", "diapers", "e-waste", "egg_shells", "food_scraps", "glass_containers", "kitchen_waste", "paints", "paper_products", "pesticides", "plastic_bottles", "plastic_bags_wrappers", "sanitary_napkin", "stroform_product", "yard_trimmings"
-]
-
 img = tf.keras.utils.load_img(test_image, target_size=(256, 256))
 
 img_array = tf.keras.utils.img_to_array(img)
 img_array = tf.expand_dims(img_array, 0)
-
-num_classes = 18
 
 base_model = tf.keras.applications.MobileNetV2(input_shape=(256, 256, 3), include_top=False, weights='imagenet')
 
@@ -62,6 +56,9 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   batch_size=32,
   seed=42
 )
+
+class_names = train_ds.class_names
+num_classes = len(class_names)
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
