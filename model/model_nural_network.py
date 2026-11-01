@@ -8,7 +8,7 @@ class_names = [
   "batteries", "cans_all_types", "cermaic_product", "cofee_tea_bags", "coffee_tea_bags", "diapers", "e-waste", "egg_shells", "food_scraps", "glass_containers", "kitchen_waste", "paints", "paper_products", "pesticides", "plastic_bottles", "plastic_bags_wrappers", "sanitary_napkin", "stroform_product", "yard_trimmings"
 ]
 
-img = tf.keras.utils.load_img(test_image, target_size=(150, 150))
+img = tf.keras.utils.load_img(test_image, target_size=(256, 256))
 
 img_array = tf.keras.utils.img_to_array(img)
 img_array = tf.expand_dims(img_array, 0)
@@ -46,7 +46,7 @@ for filters, num_layers in architecture_blueprint:
   for _ in range(num_layers):
     layers_list.append(tf.keras.layers.Conv2D(filters, (3, 3), activation='relu', padding="same"))
   if (filters > 32):
-    layers_list.append(tf.keras.layers.MaxPooling2D((2, 2), padding="same"))
+    layers_list.append(tf.keras.layers.MaxPool2D((2, 2), padding="same"))
 
 layers_list.extend([
   tf.keras.layers.Flatten(),
