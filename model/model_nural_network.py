@@ -50,75 +50,46 @@ img_array = tf.expand_dims(img_array, 0)
 
 num_classes = 18
 
-architecture_blueprint = [
-  (32, 3),
-  (64, 3),
-  (128, 3),
-  (256, 3)
-]
+base_model = tf.keras.applications.MobileNetV2(input_shape=(256, 256, 3), include_top=False, weights='imagenet')
 
-train_ds = tf.keras.utils.image_dataset_from_directory(
+base_model.trainable = False
+
+train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
   validation_split=0.2,
   subset="training",
-  seed=42,
   image_size=(256, 256),
-  batch_size=32
-) 
-
-val_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="validation",
-  seed=42,
-  image_size=(256, 256),
-  batch_size=32
+  batch_size=32,
+  seed=42
 )
 
-layers_list = [tf.keras.layers.Input(shape=(256, 256, 3))]
+val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+  data_dir,
+  validation_split=0.8,
+  subset="validation",
+  image_size=(256, 256),
+  batch_size=32,
+  seed=42
+)
 
-for filters, num_layers in architecture_blueprint:
-  for _ in range(num_layers):
-    layers_list.append(tf.keras.layers.Conv2D(filters, (3, 3), activation='relu', padding="same"))
-  if (filters > 32):
-    layers_list.append(tf.keras.layers.MaxPool2D((2, 2), padding="same"))
+model = tf.keras.Sequential([
+  base_model,
 
-layers_list.extend([
-  tf.keras.layers.Flatten(),
-  
-  tf.keras.layers.Dense(512, activation='relu'),
-  tf.keras.layers.Dropout(0.5),
-
-  tf.keras.layers.Dense(256, activation='relu'),
-  tf.keras.layers.Dropout(0.3),
+  tf.keras.layers.GlobalAveragePooling2D(),
+  tf.keras.layers.Dropout(0.2),
 
   tf.keras.layers.Dense(num_classes, activation='softmax')
 ])
 
-model = tf.keras.Sequential(layers_list)
-
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
+model.compile(optimizer='adam', 
+              loss='sparse_categorical_crossentropy', 
               metrics=['accuracy'])
 
-model.summary()
+model.fit(train_ds, validation_data=val_ds, epochs=20)
 
-early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-
-model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=40,
-)
-
-model.save("waste_classifier_model.keras")
+model.save("waste_classifier.keras")
 
 predictions = model.predict(img_array)
+highest_score = np.argmax(predictions)
 
-highest_score_index = np.argmax(predictions)
-
-predicted_class = class_names[highest_score_index]
-
-confidence = 100 * np.max(predictions)
-
-print(f"Predicted class: {predicted_class} with confidence: {confidence:.2f}%")
+print(class_names[highest_score])
