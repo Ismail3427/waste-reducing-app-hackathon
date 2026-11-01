@@ -1,8 +1,44 @@
 import tensorflow as tf
+from PIL import Image
+
 import numpy as np
+import os
 
 data_dir = ""
 test_image = ""
+
+converted_count = 0
+deleted_count = 0
+
+for root, dirs, files in os.walk(data_dir):
+  for file in files:
+    if file.startswith("."):
+      continue
+
+    file_path = os.path.join(root, file)
+
+    try:
+      with Image.open(file_path) as img:
+        if img.format == "WEBP":
+          base, _ = os.path.splitext(file_path)
+          new_path = base + ".png"
+          img.save(new_path, "PNG")
+
+          os.remove(file_path)
+
+          converted_count += 1
+        else:
+          img.verify()
+
+    except Exception as e:
+      try:
+        os.remove(file_path)
+        deleted_count += 1
+      except Exception as rm_err:
+        print(f"⚠️ Could not delete {file_path}: {rm_err}")
+
+print(converted_count, "images converted from WEBP to PNG.")
+print (deleted_count, "corrupted images deleted.")
 
 class_names = [
   "batteries", "cans_all_types", "cermaic_product", "cofee_tea_bags", "coffee_tea_bags", "diapers", "e-waste", "egg_shells", "food_scraps", "glass_containers", "kitchen_waste", "paints", "paper_products", "pesticides", "plastic_bottles", "plastic_bags_wrappers", "sanitary_napkin", "stroform_product", "yard_trimmings"
