@@ -82,7 +82,7 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy', 
               metrics=['accuracy'])
 
-model.fit(train_ds, validation_data=val_ds, epochs=20)
+model.fit(train_ds, validation_data=val_ds, epochs=40)
 
 model.save("waste_classifier.keras")
 
