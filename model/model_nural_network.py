@@ -1,11 +1,10 @@
 import tensorflow as tf
 from PIL import Image
-
 import numpy as np
 import os
 
-data_dir = ""
-test_image = ""
+data_dir = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/images/"
+test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.png"
 
 converted_count = 0
 deleted_count = 0
@@ -35,7 +34,7 @@ for root, dirs, files in os.walk(data_dir):
         os.remove(file_path)
         deleted_count += 1
       except Exception as rm_err:
-        print(f"⚠️ Could not delete {file_path}: {rm_err}")
+        print(f"Could not delete {file_path}: {rm_err}")
 
 print(converted_count, "images converted from WEBP to PNG.")
 print (deleted_count, "corrupted images deleted.")
@@ -110,8 +109,9 @@ model.fit(
   train_ds,
   validation_data=val_ds,
   epochs=40,
-  callbacks=[early_stop]
 )
+
+model.save("waste_classifier_model.keras")
 
 predictions = model.predict(img_array)
 
