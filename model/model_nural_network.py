@@ -62,7 +62,7 @@ num_classes = len(class_names)
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
-  validation_split=0.8,
+  validation_split=0.2,
   subset="validation",
   image_size=(256, 256),
   batch_size=32,
@@ -70,6 +70,8 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
 )
 
 model = tf.keras.Sequential([
+  tf.keras.layers.Lambda(tf.keras.applications.mobilenet_v2.preprocess_input, input_shape=(256, 256, 3)),
+    
   base_model,
 
   tf.keras.layers.GlobalAveragePooling2D(),
@@ -85,6 +87,8 @@ model.compile(optimizer='adam',
 model.fit(train_ds, validation_data=val_ds, epochs=40)
 
 model.save("waste_classifier.keras")
+
+img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
 
 predictions = model.predict(img_array)
 highest_score = np.argmax(predictions)
