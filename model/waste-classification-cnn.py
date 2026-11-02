@@ -19,10 +19,11 @@ for directory in os.listdir(data_dir):
       continue
     allowed_extensions = ["png", "jpg", "jpeg", "gif", "bmp"]
     change_needed = False
+    num_of_times = 0
     for extension in allowed_extensions:
       if file.endswith(extension):
-        break
-      else:
+        num_of_times += 1
+      if num_of_times == len(allowed_extensions):
         change_needed = True
     if change_needed:
       try:
