@@ -10,32 +10,23 @@ test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.p
 converted_count = 0
 deleted_count = 0
 
-for root, dirs, files in os.walk(data_dir):
-  for file in files:
-    if file.startswith("."):
-      continue
-
-    file_path = os.path.join(root, file)
-
-    try:
-      with Image.open(file_path) as img:
-        if img.format == "WEBP":
-          base, _ = os.path.splitext(file_path)
-          new_path = base + ".png"
-          img.save(new_path, "PNG")
-
-          os.remove(file_path)
-
+for directory in os.listdir(data_dir):
+  for file in os.listdir(os.path.join(data_dir, directory)):
+    allowed_extensions = ["png", "jpg", "jpeg", "gif", "bmp"]
+    for extension in allowed_extensions:
+      if file.endswith(extension):
+        break
+      else:
+        try:
+          full_path = os.path.join(data_dir, directory, file)
+          os.remove(full_path)
+          img = Image.open(full_path)
+          saved_image = img.save(full_path.split(".")[0] + ".png", "PNG")
           converted_count += 1
-        else:
-          img.verify()
-
-    except Exception as e:
-      try:
-        os.remove(file_path)
-        deleted_count += 1
-      except Exception as rm_err:
-        print(f"Could not delete {file_path}: {rm_err}")
+        except Exception as e:
+          print(e)
+          os.remove(full_path)
+          deleted_count += 1
 
 print(converted_count, "images converted from WEBP to PNG.")
 print (deleted_count, "corrupted images deleted.")
