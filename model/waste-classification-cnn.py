@@ -13,19 +13,22 @@ deleted_count = 0
 for directory in os.listdir(data_dir):
   for file in os.listdir(os.path.join(data_dir, directory)):
     allowed_extensions = ["png", "jpg", "jpeg", "gif", "bmp"]
+    change_needed = False
     for extension in allowed_extensions:
       if file.endswith(extension):
         break
       else:
-        try:
-          full_path = os.path.join(data_dir, directory, file)
-          img = Image.open(full_path)
-          saved_image = img.save(full_path.split(".")[0] + ".png", "PNG")
-          converted_count += 1
-          os.remove(full_path)
-        except Exception as e:
-          os.remove(full_path)
-          deleted_count += 1
+        change_needed = True
+    if change_needed:
+      try:
+        full_path = os.path.join(data_dir, directory, file)
+        img = Image.open(full_path)
+        saved_image = img.save(full_path.split(".")[0] + ".png", "PNG")
+        converted_count += 1
+        os.remove(full_path)
+      except Exception as e:
+        os.remove(full_path)
+        deleted_count += 1
 
 print(converted_count, "images converted from WEBP to PNG.")
 print (deleted_count, "corrupted images deleted.")
