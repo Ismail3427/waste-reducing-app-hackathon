@@ -12,7 +12,11 @@ converted_count = 0
 deleted_count = 0
 
 for directory in os.listdir(data_dir):
+  if directory == ".DS_Store":
+    continue
   for file in os.listdir(os.path.join(data_dir, directory)):
+    if file == ".DS_Store":
+      continue
     allowed_extensions = ["png", "jpg", "jpeg", "gif", "bmp"]
     change_needed = False
     for extension in allowed_extensions:
