@@ -30,7 +30,7 @@ for directory in os.listdir(data_dir):
         os.remove(full_path)
         deleted_count += 1
 
-print(converted_count, "images converted from WEBP to PNG.")
+print(converted_count, "images converted to PNG.")
 print (deleted_count, "corrupted images deleted.")
 
 img = keras.utils.load_img(test_image, target_size=(256, 256))
