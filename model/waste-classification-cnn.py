@@ -16,12 +16,12 @@ for directory in os.listdir(data_dir):
     continue
   for file in os.listdir(os.path.join(data_dir, directory)):
     if file == ".DS_Store":
-      continue
-    allowed_extensions = ["png", "jpg", "jpeg", "gif", "bmp"]
+      os.remove(os.path.join(data_dir, directory, file))
+    allowed_extensions = ["png", "jpeg", "gif", "bmp"]
     change_needed = False
     num_of_times = 0
     for extension in allowed_extensions:
-      if file.endswith(extension):
+      if not file.endswith(extension):
         num_of_times += 1
       if num_of_times == len(allowed_extensions):
         change_needed = True
@@ -73,6 +73,9 @@ val_ds = keras.preprocessing.image_dataset_from_directory(
     seed=42
 )
 
+class_names = train_ds.class_names
+num_classes = len(class_names)
+
 train_ds = train_ds.map(preprocess).map(augment).cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
 val_ds = val_ds.map(preprocess).cache().prefetch(buffer_size=tf.data.AUTOTUNE)
 
@@ -83,7 +86,7 @@ model = keras.Sequential([
     base_model,
     keras.layers.GlobalAveragePooling2D(),
     keras.layers.Dropout(0.3),
-    keras.layers.Dense(len(train_ds.class_names), activation='softmax')
+    keras.layers.Dense(num_classes, activation='softmax')
 ])
 
 model.compile(
