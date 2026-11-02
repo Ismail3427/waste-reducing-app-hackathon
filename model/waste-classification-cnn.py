@@ -19,12 +19,11 @@ for directory in os.listdir(data_dir):
       else:
         try:
           full_path = os.path.join(data_dir, directory, file)
-          os.remove(full_path)
           img = Image.open(full_path)
           saved_image = img.save(full_path.split(".")[0] + ".png", "PNG")
           converted_count += 1
+          os.remove(full_path)
         except Exception as e:
-          print(e)
           os.remove(full_path)
           deleted_count += 1
 
