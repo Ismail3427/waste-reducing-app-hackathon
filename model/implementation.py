@@ -9,7 +9,7 @@ img_array = tf.expand_dims(img_array, 0)
 img_array = keras.applications.mobilenet_v2.preprocess_input(img_array)
 
 
-model = keras.models.load_model("/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/waste_classifier.keras", custom_objects={"preprocess_input": keras.applications.mobilenet_v2.preprocess_input})
+model = keras.models.load_model("/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/waste_classifier2.keras", custom_objects={"preprocess_input": keras.applications.mobilenet_v2.preprocess_input})
 
 predictions = model.predict(img_array)
 
