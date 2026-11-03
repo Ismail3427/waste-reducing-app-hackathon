@@ -69,7 +69,7 @@ class_names = train_ds.class_names
 num_classes = len(class_names)
 
 model = keras.Sequential([
-  keras.layers.Rescaling(1./255, input_shape=(224, 224, 3)),
+  keras.layers.Rescaling(1./127.5, offset=-1, input_shape=(224, 224, 3)),
   
   data_augmentation,
 
