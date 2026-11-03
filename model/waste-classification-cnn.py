@@ -17,32 +17,26 @@ for dir in os.listdir(data_dir):
         if file == ".DS_Store":
             continue
         allowed_exts = ["jpeg", "png", "gif", "bmp"]
-        change_needed = False
-        amount = 0
-        for ext in allowed_exts:
-            if not file.lower().endswith(ext):
-                amount += 1
-            if amount == len(allowed_exts):
-                change_needed = True
-        if (change_needed):
-            try:
-              with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
-                image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG")
-                os.remove(os.path.join(data_dir, dir, file))
-                converted_count += 1
-                print(f"Converted {file} to PNG")
-                file = os.path.join(data_dir, dir, file.split(".")[0] + ".png")
-            except Exception as e:
+        try:
+          with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
+            image_loaded.verify()
+
+          with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
+            acutal_ext = image_loaded.format.lower()
+            if (acutal_ext not in allowed_exts):
+              image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG", icc_profile=None)
               os.remove(os.path.join(data_dir, dir, file))
-              deleted_count += 1
-              print(f"Deleted {file} due to error")
-        if file.lower().endswith(".png"):
-          img_path = os.path.join(data_dir, dir, file)
-          try:
-              with Image.open(img_path) as img:
-                  img.save(img_path, icc_profile=None)
-          except Exception as e:
-              print(f"Skipping broken image {file}: {e}")
+              converted_count += 1
+              print(f"Converted {file} to PNG")
+              file = os.path.join(data_dir, dir, file.split(".")[0] + ".png")
+              if image_loaded.mode in ("RGBA", "P", "CMYK"):
+                image_loaded = image_loaded.convert("RGB")
+            else:
+              image_loaded.save(os.path.join(data_dir, dir, file), image_loaded.format, icc_profile=None)
+        except Exception as e:
+          os.remove(os.path.join(data_dir, dir, file))
+          deleted_count += 1
+          print(f"Deleted {file} due to error")
 
 print(f"Converted: {converted_count}")
 print(f"Deleted: {deleted_count}")
