@@ -6,6 +6,7 @@ import os
 
 data_dir = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/images/"
 test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.png"
+
 converted_count = 0
 deleted_count = 0
 
