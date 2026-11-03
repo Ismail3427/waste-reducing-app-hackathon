@@ -7,38 +7,39 @@ from keras.applications.mobilenet_v2 import preprocess_input
 
 data_dir = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/images/"
 test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.png"
-
 converted_count = 0
 deleted_count = 0
 
-for directory in os.listdir(data_dir):
-  if directory == ".DS_Store":
-    continue
-  for file in os.listdir(os.path.join(data_dir, directory)):
-    if file == ".DS_Store":
-      os.remove(os.path.join(data_dir, directory, file))
-    allowed_extensions = ["png", "jpeg", "gif", "bmp"]
-    change_needed = False
-    num_of_times = 0
-    for extension in allowed_extensions:
-      if not file.endswith(extension):
-        num_of_times += 1
-      if num_of_times == len(allowed_extensions):
-        change_needed = True
-    if change_needed:
-      try:
-        full_path = os.path.join(data_dir, directory, file)
-        img = Image.open(full_path)
-        saved_image = img.save(full_path.split(".")[0] + ".png", "PNG")
-        converted_count += 1
-        os.remove(full_path)
-      except Exception as e:
-        os.remove(full_path)
-        deleted_count += 1
+for dir in os.listdir(data_dir):
+    if dir == ".DS_Store":
+        continue
+    for file in os.listdir(os.path.join(data_dir, dir)):
+        if file == ".DS_Store":
+            continue
+        allowed_exts = ["jpeg", "png", "gif", "bmp"]
+        change_needed = False
+        amount = 0
+        for ext in allowed_exts:
+            if not file.lower().endswith(ext):
+                amount += 1
+            if amount == len(allowed_exts):
+                change_needed = True
+        if (change_needed):
+            try:
+              image_loaded = Image.open(os.path.join(data_dir, dir, file))
+              image_loaded = image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG")
+              os.remove(os.path.join(data_dir, dir, file))
+              converted_count += 1
+              print(f"Converted {file} to PNG")
+            except Exception as e:
+              print(f"Error processing file")
+              os.remove(os.path.join(data_dir, dir, file))
+              deleted_count += 1
+              print(f"Deleted {file} due to error")
 
-print(converted_count, "images converted to PNG.")
-print (deleted_count, "corrupted images deleted.")
-            
+print(f"Converted: {converted_count}")
+print(f"Deleted: {deleted_count}")
+
 data_augmentation = keras.Sequential([
     keras.layers.RandomFlip("horizontal"),
     keras.layers.RandomRotation(0.1),
