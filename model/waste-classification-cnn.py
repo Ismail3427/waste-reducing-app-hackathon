@@ -32,7 +32,6 @@ for dir in os.listdir(data_dir):
               converted_count += 1
               print(f"Converted {file} to PNG")
             except Exception as e:
-              print(f"Error processing file")
               os.remove(os.path.join(data_dir, dir, file))
               deleted_count += 1
               print(f"Deleted {file} due to error")
