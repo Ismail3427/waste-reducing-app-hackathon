@@ -17,98 +17,103 @@ for dir in os.listdir(data_dir):
             continue
         allowed_exts = ["jpeg", "png", "gif", "bmp"]
         try:
-          with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
-            image_loaded.verify()
+            with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
+                image_loaded.verify()
 
-          with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
-            acutal_ext = image_loaded.format.lower()
-            if (acutal_ext not in allowed_exts):
-              image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG", icc_profile=None)
-              os.remove(os.path.join(data_dir, dir, file))
-              converted_count += 1
-              print(f"Converted {file} to PNG")
-              file = os.path.join(data_dir, dir, file.split(".")[0] + ".png")
-              if image_loaded.mode in ("RGBA", "P", "CMYK"):
-                image_loaded = image_loaded.convert("RGB")
-            else:
-              image_loaded.save(os.path.join(data_dir, dir, file), image_loaded.format, icc_profile=None)
+            with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
+                acutal_ext = image_loaded.format.lower()
+                if acutal_ext not in allowed_exts:
+                    image_loaded.save(
+                        os.path.join(data_dir, dir, file.split(".")[0] + ".png"),
+                        "PNG",
+                        icc_profile=None,
+                    )
+                    os.remove(os.path.join(data_dir, dir, file))
+                    converted_count += 1
+                    print(f"Converted {file} to PNG")
+                    file = os.path.join(data_dir, dir, file.split(".")[0] + ".png")
+                    if image_loaded.mode in ("RGBA", "P", "CMYK"):
+                        image_loaded = image_loaded.convert("RGB")
+                else:
+                    image_loaded.save(
+                        os.path.join(data_dir, dir, file),
+                        image_loaded.format,
+                        icc_profile=None,
+                    )
         except Exception as e:
-          os.remove(os.path.join(data_dir, dir, file))
-          deleted_count += 1
-          print(f"Deleted {file} due to error")
+            os.remove(os.path.join(data_dir, dir, file))
+            deleted_count += 1
+            print(f"Deleted {file} due to error")
 
 print(f"Converted: {converted_count}")
 print(f"Deleted: {deleted_count}")
 
-data_augmentation = keras.Sequential([
-    keras.layers.RandomFlip("horizontal"),
-    keras.layers.RandomRotation(0.1),
-    keras.layers.RandomZoom(0.2),
-    keras.layers.RandomFlip("vertical")
-])
+data_augmentation = keras.Sequential(
+    [
+        keras.layers.RandomFlip("horizontal"),
+        keras.layers.RandomRotation(0.1),
+        keras.layers.RandomZoom(0.2),
+        keras.layers.RandomFlip("vertical"),
+    ]
+)
 
 train_ds = keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="training",
-  image_size=(224, 224),
-  batch_size=32,
-  seed=42
+    data_dir,
+    validation_split=0.2,
+    subset="training",
+    image_size=(224, 224),
+    batch_size=32,
+    seed=42,
 )
 
 val_ds = keras.utils.image_dataset_from_directory(
-  data_dir,
-  validation_split=0.2,
-  subset="validation",
-  image_size=(224, 224),
-  batch_size=32,
-  seed=42
+    data_dir,
+    validation_split=0.2,
+    subset="validation",
+    image_size=(224, 224),
+    batch_size=32,
+    seed=42,
 )
 
 class_names = train_ds.class_names
 num_classes = len(class_names)
 
-model = keras.Sequential([
-  keras.layers.Rescaling(1./127.5, offset=-1, input_shape=(224, 224, 3)),
-  
-  data_augmentation,
+model = keras.Sequential(
+    [
+        keras.layers.Rescaling(1.0 / 127.5, offset=-1, input_shape=(224, 224, 3)),
+        data_augmentation,
+        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
+        keras.layers.MaxPooling2D((2, 2)),
+        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+        keras.layers.MaxPooling2D((2, 2)),
+        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+        keras.layers.MaxPooling2D((2, 2)),
+        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
+        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
+        keras.layers.MaxPooling2D((2, 2)),
+        keras.layers.Flatten(),
+        keras.layers.Dense(512, activation="relu"),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(256, activation="relu"),
+        keras.layers.Dropout(0.3),
+        keras.layers.Dense(num_classes, activation="softmax"),
+    ]
+)
 
-  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
+saftey_stop = keras.callbacks.EarlyStopping(
+    monitor="val_loss", patience=5, restore_best_weights=True
+)
 
-  keras.layers.MaxPooling2D((2, 2)),
-
-  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-
-  keras.layers.MaxPooling2D((2, 2)),
-
-  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-
-  keras.layers.MaxPooling2D((2, 2)),
-
-  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
-
-  keras.layers.MaxPooling2D((2, 2)),
-
-  keras.layers.Flatten(),
-
-  keras.layers.Dense(512, activation='relu'),
-  keras.layers.Dropout(0.5),
-
-  keras.layers.Dense(256, activation='relu'),
-  keras.layers.Dropout(0.3),
-
-  keras.layers.Dense(num_classes, activation='softmax')
-])
-
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(
+    optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+)
 
 model.fit(train_ds, validation_data=val_ds, epochs=40)
 
