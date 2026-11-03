@@ -26,15 +26,23 @@ for dir in os.listdir(data_dir):
                 change_needed = True
         if (change_needed):
             try:
-              image_loaded = Image.open(os.path.join(data_dir, dir, file))
-              image_loaded = image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG")
-              os.remove(os.path.join(data_dir, dir, file))
-              converted_count += 1
-              print(f"Converted {file} to PNG")
+              with Image.open(os.path.join(data_dir, dir, file)) as image_loaded:
+                image_loaded.save(os.path.join(data_dir, dir, file.split(".")[0] + ".png"), "PNG")
+                os.remove(os.path.join(data_dir, dir, file))
+                converted_count += 1
+                print(f"Converted {file} to PNG")
+                file = os.path.join(data_dir, dir, file.split(".")[0] + ".png")
             except Exception as e:
               os.remove(os.path.join(data_dir, dir, file))
               deleted_count += 1
               print(f"Deleted {file} due to error")
+        if file.lower().endswith(".png"):
+          img_path = os.path.join(data_dir, dir, file)
+          try:
+              with Image.open(img_path) as img:
+                  img.save(img_path, icc_profile=None)
+          except Exception as e:
+              print(f"Skipping broken image {file}: {e}")
 
 print(f"Converted: {converted_count}")
 print(f"Deleted: {deleted_count}")
@@ -59,7 +67,7 @@ train_ds = keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="training",
-    image_size=(256, 256),
+    image_size=(224, 224),
     batch_size=32,
     seed=42
 )
@@ -68,7 +76,7 @@ val_ds = keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="validation",
-    image_size=(256, 256),
+    image_size=(224, 224),
     batch_size=32,
     seed=42
 )
@@ -79,7 +87,7 @@ num_classes = len(class_names)
 train_ds = train_ds.map(preprocess).map(augment).cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
 val_ds = val_ds.map(preprocess).cache().prefetch(buffer_size=tf.data.AUTOTUNE)
 
-base_model = keras.applications.MobileNetV2(input_shape=(256, 256, 3), include_top=False, weights='imagenet')
+base_model = keras.applications.MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights='imagenet')
 base_model.trainable = False
 
 model = keras.Sequential([
@@ -100,6 +108,8 @@ early_stopping = tf.keras.callbacks.EarlyStopping(
     patience=6,
     restore_best_weights=True
 )
+
+base_model.trainable = True
 model.fit(train_ds, validation_data=val_ds, epochs=40, callbacks=[early_stopping])
 
 model.save("waste_classifier2.keras")
