@@ -82,32 +82,41 @@ num_classes = len(class_names)
 model = keras.Sequential(
     [
         keras.layers.Rescaling(1.0 / 127.5, offset=-1, input_shape=(224, 224, 3)),
+
         data_augmentation,
+
         keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.MaxPooling2D((2, 2)),
+
         keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.MaxPooling2D((2, 2)),
+        
         keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.MaxPooling2D((2, 2)),
+        
         keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
         keras.layers.BatchNormalization(),
         keras.layers.MaxPooling2D((2, 2)),
+        
         keras.layers.GlobalAveragePooling2D(),
+        
         keras.layers.Dense(512, activation="relu"),
         keras.layers.Dropout(0.5),
+        
         keras.layers.Dense(256, activation="relu"),
         keras.layers.Dropout(0.3),
+        
         keras.layers.Dense(num_classes, activation="softmax"),
     ]
 )
