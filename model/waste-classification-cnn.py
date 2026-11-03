@@ -3,7 +3,6 @@ from PIL import Image
 import numpy as np
 import keras
 import os
-from keras.applications.mobilenet_v2 import preprocess_input
 
 data_dir = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/images/"
 test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.png"
@@ -48,72 +47,80 @@ data_augmentation = keras.Sequential([
     keras.layers.RandomFlip("vertical")
 ])
 
-def preprocess(image, label):
-    image = tf.cast(image, tf.float32)
-    image = preprocess_input(image)
-    return image, label
-
-def augment(image, label):
-    image = data_augmentation(image)
-    return image, label
-
-train_ds = keras.preprocessing.image_dataset_from_directory(
-    data_dir,
-    validation_split=0.2,
-    subset="training",
-    image_size=(224, 224),
-    batch_size=32,
-    seed=42
+train_ds = keras.utils.image_dataset_from_directory(
+  data_dir,
+  validation_split=0.2,
+  subset="training",
+  image_size=(224, 224),
+  batch_size=32,
+  seed=42
 )
 
-val_ds = keras.preprocessing.image_dataset_from_directory(
-    data_dir,
-    validation_split=0.2,
-    subset="validation",
-    image_size=(224, 224),
-    batch_size=32,
-    seed=42
+val_ds = keras.utils.image_dataset_from_directory(
+  data_dir,
+  validation_split=0.2,
+  subset="validation",
+  image_size=(224, 224),
+  batch_size=32,
+  seed=42
 )
 
 class_names = train_ds.class_names
 num_classes = len(class_names)
 
-train_ds = train_ds.map(preprocess).map(augment).cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
-val_ds = val_ds.map(preprocess).cache().prefetch(buffer_size=tf.data.AUTOTUNE)
-
-base_model = keras.applications.MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights='imagenet')
-base_model.trainable = False
-
 model = keras.Sequential([
-    base_model,
-    keras.layers.GlobalAveragePooling2D(),
-    keras.layers.Dropout(0.3),
-    keras.layers.Dense(num_classes, activation='softmax')
+  keras.layers.Rescaling(1./255, input_shape=(224, 224, 3)),
+  
+  data_augmentation,
+
+  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
+
+  keras.layers.MaxPooling2D((2, 2)),
+
+  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+
+  keras.layers.MaxPooling2D((2, 2)),
+
+  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+
+  keras.layers.MaxPooling2D((2, 2)),
+
+  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+  keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same'),
+
+  keras.layers.MaxPooling2D((2, 2)),
+
+  keras.layers.Flatten(),
+
+  keras.layers.Dense(512, activation='relu'),
+  keras.layers.Dropout(0.5),
+
+  keras.layers.Dense(256, activation='relu'),
+  keras.layers.Dropout(0.3),
+
+  keras.layers.Dense(num_classes, activation='softmax')
 ])
 
-model.compile(
-    optimizer='adam',
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
-)
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-early_stopping = tf.keras.callbacks.EarlyStopping(
-    monitor='val_loss',
-    patience=6,
-    restore_best_weights=True
-)
+model.fit(train_ds, validation_data=val_ds, epochs=40)
 
-base_model.trainable = True
-model.fit(train_ds, validation_data=val_ds, epochs=40, callbacks=[early_stopping])
+model.save("waste_classifier.keras")
 
-model.save("waste_classifier2.keras")
-
-img = keras.utils.load_img(test_image, target_size=(256, 256))
+img = keras.utils.load_img(test_image, target_size=(224, 224))
 img_array = keras.utils.img_to_array(img)
-img_array = tf.expand_dims(img_array, 0)
-img_array = preprocess_input(img_array)
 
 predictions = model.predict(img_array)
+
 highest_score = np.argmax(predictions)
 
-print("Predicted class:", train_ds.class_names[highest_score])
+prediction = class_names[highest_score]
+
+print(f"Predicted class: {prediction}")
