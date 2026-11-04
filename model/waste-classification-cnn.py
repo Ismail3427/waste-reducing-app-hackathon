@@ -94,7 +94,7 @@ model = keras.Sequential(
     [
         data_augmentation,
         keras.layers.Lambda(
-            lambda x: tf.keras.applications.mobilenet_v2.preprocess_input(x)
+            lambda x: keras.applications.mobilenet_v2.preprocess_input(x)
         ),
         base_model,
         keras.layers.GlobalAveragePooling2D(),
