@@ -98,7 +98,7 @@ model = keras.Sequential(
         ),
         base_model,
         keras.layers.GlobalAveragePooling2D(),
-        keras.layers.Dropout(0.5),
+        keras.layers.Dropout(0.2),
         keras.layers.Dense(num_classes, activation="softmax"),
     ]
 )
