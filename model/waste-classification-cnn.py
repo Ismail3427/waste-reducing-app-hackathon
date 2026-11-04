@@ -93,11 +93,12 @@ val_ds = val_ds.prefetch(buffer_size=AUTOTUNE)
 model = keras.Sequential(
     [
         data_augmentation,
-        keras.layers.Lambda(
+        keras.layers.Lambda( 
             lambda x: keras.applications.mobilenet_v2.preprocess_input(x)
         ),
         base_model,
         keras.layers.GlobalAveragePooling2D(),
+        keras.layers.Dropout(0.5),
         keras.layers.Dense(num_classes, activation="softmax"),
     ]
 )
