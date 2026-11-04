@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 import keras
 import os
+from keras.applications import MobileNetV2
 
 data_dir = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/images/"
 test_image = "/Users/sajadeen/Desktop/GitHub/waste-reducing-app-hackathon/test.png"
@@ -79,75 +80,56 @@ val_ds = keras.utils.image_dataset_from_directory(
 class_names = train_ds.class_names
 num_classes = len(class_names)
 
+base_model = MobileNetV2(
+    input_shape=(224, 224, 3), include_top=False, weights="imagenet"
+)
+
+base_model.trainable = False
+
+AUTOTUNE = tf.data.AUTOTUNE
+train_ds = train_ds.prefetch(buffer_size=AUTOTUNE)
+val_ds = val_ds.prefetch(buffer_size=AUTOTUNE)
+
 model = keras.Sequential(
     [
-        keras.layers.Rescaling(1.0 / 127.5, offset=-1, input_shape=(224, 224, 3)),
-
         data_augmentation,
-
-        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2, 2)),
-
-        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2, 2)),
-        
-        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2, 2)),
-        
-        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.Conv2D(256, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
-        keras.layers.MaxPooling2D((2, 2)),
-        
+        keras.layers.Lambda(
+            lambda x: tf.keras.applications.mobilenet_v2.preprocess_input(x)
+        ),
+        base_model,
         keras.layers.GlobalAveragePooling2D(),
-        
-        keras.layers.Dense(512, activation="relu"),
-        keras.layers.Dropout(0.5),
-        
-        keras.layers.Dense(256, activation="relu"),
-        keras.layers.Dropout(0.3),
-        
         keras.layers.Dense(num_classes, activation="softmax"),
     ]
 )
 
-saftey_stop = keras.callbacks.EarlyStopping(
-    monitor="val_loss", patience=5, restore_best_weights=True
+model.compile(
+    loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
 )
+
+model.fit(train_ds, validation_data=val_ds, epochs=15)
+
+base_model.trainable = True
+
+for layer in base_model.layers[:100]:
+    layer.trainable = False
+
+custom_omtimizer = keras.optimizers.Adam(learning_rate=1e-5)
 
 model.compile(
-    optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+    loss="sparse_categorical_crossentropy",
+    optimizer=custom_omtimizer,
+    metrics=["accuracy"],
 )
 
-model.fit(train_ds, validation_data=val_ds, epochs=40)
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor="val_loss", patience=5, restore_best_weights=True
+)
+model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=40,
+    callbacks=[early_stopping],
+    initial_epoch=15,
+)
 
-model.save("waste_classifier.keras")
-
-img = keras.utils.load_img(test_image, target_size=(224, 224))
-img_array = keras.utils.img_to_array(img)
-
-predictions = model.predict(img_array)
-
-highest_score = np.argmax(predictions)
-
-prediction = class_names[highest_score]
-
-print(f"Predicted class: {prediction}")
+model.save("waste_classification_model.keras")
