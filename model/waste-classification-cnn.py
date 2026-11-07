@@ -56,6 +56,8 @@ data_augmentation = keras.Sequential(
         keras.layers.RandomRotation(0.1),
         keras.layers.RandomZoom(0.2),
         keras.layers.RandomFlip("vertical"),
+        keras.layers.RandomContrast(0.2),
+        keras.layers.RandomTranslation(0.1, 0.1)
     ]
 )
 
@@ -114,12 +116,12 @@ base_model.trainable = True
 for layer in base_model.layers[:100]:
     layer.trainable = False
 
-custom_omtimizer = keras.optimizers.Adam(learning_rate=1e-5)
+custom_omtimizer = keras.optimizers.Adam(learning_rate=1e-4)
 
 model.compile(
     loss="sparse_categorical_crossentropy",
     optimizer=custom_omtimizer,
-    metrics=["accuracy"],
+    metrics=["accuracy"]
 )
 
 early_stopping = keras.callbacks.EarlyStopping(
