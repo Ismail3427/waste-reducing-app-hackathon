@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "conversation_ai.apps.ConversationAiConfig",
     "user.apps.UserConfig",
+    "cnn_ai.apps.CnnAiConfig",
 ]
 
 MIDDLEWARE = [
