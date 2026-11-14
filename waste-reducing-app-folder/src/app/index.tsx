@@ -1,12 +1,19 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, ScrollView } from "react-native";
 
 export default function Index() {
   return (
-    <View>
-      <Text>Welcome to our app</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.mainContainer}>
+      <View>
+        <Text>Welcome to our app</Text>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
 });
