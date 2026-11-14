@@ -3,12 +3,12 @@ import uuid
 from user.models import User
 
 class Message(models.Model):
-  id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   role = models.CharField()
   content = models.CharField()
 
 class Conversation(models.Model):
-  id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   thread = models.ManyToManyField(Message)
   user = models.ForeignKey(
     User,
