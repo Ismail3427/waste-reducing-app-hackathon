@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,13 +26,17 @@ export default function RootLayout() {
                   </View>
                   <View>
                     <Button icon={"login"} mode="contained">
-                      <Text style={{ textAlign: "center" }}>Sign In</Text>
+                      <Text style={{ textAlign: "center" }} onPress={() => router.push("/login")}>Sign In</Text>
                     </Button>
                   </View>
                 </View>
               </>
             ),
           }}
+        />
+        <Stack.Screen
+          name="login"
+          options={{ title: "Login to TACL", headerShown: false }}
         />
       </Stack>
     </PaperProvider>

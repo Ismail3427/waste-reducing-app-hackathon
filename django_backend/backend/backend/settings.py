@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-d=y9=vvm#iy7%v5t50(ef(%=gk6gi9ji0$@b7oje^2p4zyxs9j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost:8000", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -50,15 +50,16 @@ CSRF_ALLOWED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'corsheaders',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'model.apps.ModelConfig',
+    "corsheaders",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "conversation_ai.apps.ConversationAiConfig",
+    "user.apps.UserConfig",
 ]
 
 MIDDLEWARE = [
