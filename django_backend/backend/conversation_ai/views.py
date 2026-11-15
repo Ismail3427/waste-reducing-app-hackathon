@@ -55,9 +55,7 @@ def continue_conversation(request):
 
         conversation.thread.add(message)
         conversation.save()
-
-        print(conversation.thread.all().values("role", "content"))
-
+        
         response = ollama.chat(
             model="llama3.2",
             messages=conversation.thread.all().values("role", "content"),
