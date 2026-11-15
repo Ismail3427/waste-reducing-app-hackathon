@@ -1,21 +1,24 @@
 import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import prisma from "./prisma";
 import { expo } from "@better-auth/expo";
+import { jwt } from "better-auth/plugins";
 
 export const auth = betterAuth({
-  plugins: [expo()],
-  emailAndPassword: {
-    enabled: true,
-  },
-  trustedOrigins: [
-    "wastereducingappfolder://",
-
-    // Development mode - Expo's exp:// scheme with local IP ranges
-    ...(process.env.NODE_ENV === "development"
-      ? [
-          "exp://", // Trust any host of the exp:// scheme
-          "exp://**", // Trust all Expo URLs (wildcard matching)
-          "exp://192.168.*.*:*/**", // Trust 192.168.x.x IP range with any port and path
-        ]
-      : []),
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  baseURL: "http://localhost:3000/",
+  plugins: [
+    expo(),
+    jwt({
+      jwt: {
+        expirationTime: "30m",
+        definePayload: ({ user }: { user: any }) => ({
+          email: user.email,
+          name: user.name,
+          userId: user.sub,
+        }),
+      },
+    }),
   ],
+  emailAndPassword: { enabled: true },
 });
