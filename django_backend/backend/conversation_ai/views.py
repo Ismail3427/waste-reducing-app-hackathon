@@ -15,24 +15,21 @@ def create_conversation(request):
         clean_data = data.validated_data
         user = User.objects.get(userId=clean_data.get("userId"))
 
-        message = models.Message.objects.create(
-            role=clean_data.get("role"), content=clean_data.get("content")
-        )
-        message.save()
-
         conversation = models.Conversation.objects.create(user=user)
-        conversation.thread.set([message])
-        conversation.save()
-        
+        models.Message.objects.create(
+            conversation=conversation,
+            role=clean_data.get("role"),
+            content=clean_data.get("content"),
+        )
+
         response = ollama.chat(
             model="llama3.2",
-            messages=list(conversation.thread.all().values("role", "content"))
+            messages=list(conversation.thread.all().values("role", "content")),
         )
         reply = response.message.content
-        sys_message = models.Message.objects.create(role="system", content=reply)
-        sys_message.save()
-        conversation.thread.add(sys_message)
-        conversation.save()
+        models.Message.objects.create(
+            conversation=conversation, role="system", content=reply
+        )
         return Response({"message": reply})
 
 
@@ -49,21 +46,20 @@ def continue_conversation(request):
         if user.id != conversation.user.id:
             return Response({"message": "Wrong user"})
 
-        message = models.Message.objects.create(
-            role=clean_data.get("role"), content=clean_data.get("content")
+        models.Message.objects.create(
+            conversation=conversation,
+            role=clean_data.get("role"),
+            content=clean_data.get("content"),
         )
 
-        conversation.thread.add(message)
-        conversation.save()
-        
         response = ollama.chat(
             model="llama3.2",
-            messages=conversation.thread.all().values("role", "content"),
+            messages=list(conversation.thread.all().values("role", "content")),
         )
 
         reply = response.message.content
 
-        sys_message = models.Message.objects.create(role="system", content=reply)
-        sys_message.save()
-        conversation.thread.add(sys_message)
+        models.Message.objects.create(
+            conversation=conversation, role="system", content=reply
+        )
         return Response({"response": reply})
