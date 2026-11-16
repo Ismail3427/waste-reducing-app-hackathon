@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from user.models import User
+from backend.user.models import User
 
 from .models import Conversation, Message
 

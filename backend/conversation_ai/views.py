@@ -2,7 +2,7 @@ from django.shortcuts import render
 from . import models
 from rest_framework.decorators import api_view
 from . import serializers
-from user.models import User
+from backend.user.models import User
 import ollama
 from rest_framework.response import Response
 
