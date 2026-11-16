@@ -1,5 +1,5 @@
 [project]
-name = "django-backend"
+name = "waste-reducing-app-hackathon"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,21 +10,19 @@ requires-python = ">=3.12"
 dependencies = [
     "django>=6.1.3",
     "django-cors-headers>=4.9.0",
-    "django-rls>=2.0.1",
-    "django-stubs>=6.1.2",
     "djangorestframework>=3.18.3",
-    "djangorestframework-stubs>=3.18.2",
     "keras>=3.15.1",
-    "numpy>=2.5.4",
+    "matplotlib>=3.11.2",
+    "numpy>=2.0.2",
     "ollama>=0.6.3",
-    "pillow>=13.0.0",
     "psycopg2-binary>=2.9.13",
     "python-dotenv>=1.2.4",
-    "tensorflow>=2.21.0",
+    "tensorflow==2.18",
+    "tensorflow-metal>=1.2.0",
 ]
 
 [project.scripts]
-django-backend = "django_backend:main"
+waste-reducing-app-hackathon = "waste_reducing_app_hackathon:main"
 
 [build-system]
 requires = ["uv_build>=0.13.8,<0.14.0"]
