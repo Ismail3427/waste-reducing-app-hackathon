@@ -10,34 +10,18 @@ export default function RootLayout() {
   return (
     <PaperProvider>
       <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Home",
-            headerShown: true,
-            headerTransparent: false,
-            header: () => (
-              <>
-                <View
-                  style={{ ...stylesheet.header, paddingTop: insets.top + 5 }}
-                >
-                  <View>
-                    <Text>hello</Text>
-                  </View>
-                  <View>
-                    <Button icon={"login"} mode="contained">
-                      <Text style={{ textAlign: "center" }} onPress={() => router.push("/login")}>Sign In</Text>
-                    </Button>
-                  </View>
-                </View>
-              </>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="login"
-          options={{ title: "Login to TACL", headerShown: false }}
-        />
+        <Stack.Screen name="(tabs)" options={{headerShown: true, headerTransparent: false, header: () => (
+          <>
+            <View style={{...stylesheet.header, paddingTop: insets.top + 5}}>
+              <View>
+                <Text>Hello, User</Text>
+              </View>
+              <View>
+                <Button icon={"account"} mode="contained">Sign In</Button>
+              </View>
+            </View>
+          </>
+        )}}/>
       </Stack>
     </PaperProvider>
   );

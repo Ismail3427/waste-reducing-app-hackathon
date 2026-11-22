@@ -180,9 +180,13 @@ PODS:
     - ExpoModulesJSI
     - ExpoModulesWorklets
     - RNWorklets
+  - ExpoNetwork (58.0.5):
+    - ExpoModulesCore
   - ExpoRouter (58.0.31):
     - ExpoModulesCore
     - RNScreens
+  - ExpoSecureStore (58.0.3):
+    - ExpoModulesCore
   - ExpoSplashScreen (58.0.14):
     - ExpoModulesCore
   - ExpoStatusBar (58.0.5):
@@ -1617,6 +1621,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-vector-icons-material-design-icons (14.0.0)
   - React-NativeModulesApple (0.88.1):
     - hermes-engine
     - React-bridging
@@ -2312,7 +2317,9 @@ DEPENDENCIES:
   - ExpoModulesJSI (from `../node_modules/expo-modules-jsi/apple`)
   - ExpoModulesWorklets (from `../node_modules/expo-modules-core/ExpoModulesWorklets.podspec`)
   - ExpoModulesWorkletsAdapter (from `../node_modules/expo-modules-core`)
+  - ExpoNetwork (from `../node_modules/expo-network/ios`)
   - ExpoRouter (from `../node_modules/expo-router/ios`)
+  - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - ExpoStatusBar (from `../node_modules/expo-status-bar/ios`)
   - ExpoSymbols (from `../node_modules/expo-symbols/ios`)
@@ -2367,6 +2374,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-vector-icons-material-design-icons (from `../node_modules/@react-native-vector-icons/material-design-icons`)"
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2461,8 +2469,12 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/expo-modules-core/ExpoModulesWorklets.podspec"
   ExpoModulesWorkletsAdapter:
     :path: "../node_modules/expo-modules-core"
+  ExpoNetwork:
+    :path: "../node_modules/expo-network/ios"
   ExpoRouter:
     :path: "../node_modules/expo-router/ios"
+  ExpoSecureStore:
+    :path: "../node_modules/expo-secure-store/ios"
   ExpoSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
   ExpoStatusBar:
@@ -2570,6 +2582,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-vector-icons-material-design-icons:
+    :path: "../node_modules/@react-native-vector-icons/material-design-icons"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-networking:
@@ -2684,7 +2698,9 @@ SPEC CHECKSUMS:
   ExpoModulesJSI: 6684bdf9d04f2e5e39f6b90189dcb0def22a55d6
   ExpoModulesWorklets: 03d171c0296cdffc054e9570e9393a7655ef360d
   ExpoModulesWorkletsAdapter: 33dd492e9c87db147c46e157c36d0761a48577c8
+  ExpoNetwork: d6af33a2d31d3d48652b28ac3d67ac85b1cb04f4
   ExpoRouter: 7c96a57464b14a338bef360493bcfe7190bcc5eb
+  ExpoSecureStore: 76bccb307911bd866852e6161dda9b1e8e281b99
   ExpoSplashScreen: 5df81b55f086d8acc7a24008537514f5379aa6f9
   ExpoStatusBar: 38eff05a54229c9a388cb56cef29117b8dc77eb1
   ExpoSymbols: 43a42871f937948a752814aaf3b0f9f0957a71c6
@@ -2738,6 +2754,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 0207d6133274a7cbfc3d0dae326e3055c8cfcf9e
   React-mutationobservernativemodule: b97a67c29f724d18a92379e7390f24350acb433a
   react-native-safe-area-context: 56700b839169ce88ffcec68c40447916fe512462
+  react-native-vector-icons-material-design-icons: 811f6c4447a60d8a66394644093dcffdc546772f
   React-NativeModulesApple: 8cfb2f308f48c48068c96b932e7f0e4297c23342
   React-networking: 3325cf73ecbdaacab0da91260b094baf36061a56
   React-oscompat: a776760fdfa152e12114f8c30d833963daac27e1
